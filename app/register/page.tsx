@@ -1,11 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Shield, Eye, EyeOff, ArrowRight, Check } from "lucide-react"
+import { Shield, Eye, EyeOff, ArrowRight, Check, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { registerUser } from "@/lib/api"
 
 const perks = [
   "Instant SOS alerts to your emergency contacts",
@@ -17,8 +20,10 @@ const perks = [
 ]
 
 export default function RegisterPage() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -31,6 +36,22 @@ export default function RegisterPage() {
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
 
   const passwordsMatch = form.confirm === "" || form.password === form.confirm
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!passwordsMatch) return
+    setLoading(true)
+    try {
+      await registerUser(form.fullName, form.email, form.password)
+      localStorage.setItem("samrakshya_email", form.email)
+      toast.success("Account created! Welcome to Samrakshya.")
+      router.push("/dashboard")
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Registration failed. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -120,7 +141,7 @@ export default function RegisterPage() {
             <p className="text-muted-foreground">Free forever. No credit card required.</p>
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
 
             {/* Full name */}
             <div className="space-y-2">
@@ -232,10 +253,19 @@ export default function RegisterPage() {
               type="submit"
               size="lg"
               className="w-full gap-2"
-              disabled={!passwordsMatch}
+              disabled={!passwordsMatch || loading}
             >
-              Create Free Account
-              <ArrowRight className="w-4 h-4" />
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating account…
+                </>
+              ) : (
+                <>
+                  Create Free Account
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </Button>
           </form>
 
