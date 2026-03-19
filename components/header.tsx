@@ -1,12 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LayoutDashboard, LogOut, Video } from "lucide-react";
 
 export function Header() {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [loggedInEmail, setLoggedInEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoggedInEmail(localStorage.getItem("samrakshya_email"))
+  }, [])
+
+  function handleSignOut() {
+    localStorage.removeItem("samrakshya_email")
+    setLoggedInEmail(null)
+    setIsMenuOpen(false)
+    router.push("/")
+  }
+
+  const navLinks = (
+    <>
+      <Link href="#features"     className="text-sm text-white/80 hover:text-white transition-colors">Features</Link>
+      <Link href="#how-it-works" className="text-sm text-white/80 hover:text-white transition-colors">How It Works</Link>
+      <Link href="#testimonials" className="text-sm text-white/80 hover:text-white transition-colors">Testimonials</Link>
+      <Link href="#contact"      className="text-sm text-white/80 hover:text-white transition-colors">Contact</Link>
+    </>
+  )
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-primary backdrop-blur-md border-b border-primary/20">
@@ -17,91 +40,47 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            <Link
-              href="#features"
-              className="text-sm text-white/80 hover:text-white transition-colors"
-            >
-              Features
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="text-sm text-white/80 hover:text-white transition-colors"
-            >
-              How It Works
-            </Link>
-            <Link
-              href="#testimonials"
-              className="text-sm text-white/80 hover:text-white transition-colors"
-            >
-              Testimonials
-            </Link>
-            <Link
-              href="#contact"
-              className="text-sm text-white/80 hover:text-white transition-colors"
-            >
-              Contact
-            </Link>
+            {navLinks}
           </nav>
 
+          {/* Desktop auth buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:text-white hover:bg-white/20"
-              asChild
-            >
-              <Link href="/login">Log In</Link>
-            </Button>
-            <Button
-              size="sm"
-              className="bg-white text-primary hover:bg-white/90 font-semibold"
-              asChild
-            >
-              <Link href="/register">Get Started</Link>
-            </Button>
-          </div>
-
-          <button
-            className="md:hidden p-2 text-white"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6" />
+            {loggedInEmail ? (
+              <>
+                <span className="text-xs text-white/60 max-w-[140px] truncate">{loggedInEmail}</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-white hover:text-white hover:bg-white/20 gap-1.5"
+                  asChild
+                >
+                  <Link href="/report">
+                    <Video className="w-4 h-4" />
+                    Report
+                  </Link>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-white hover:text-white hover:bg-white/20 gap-1.5"
+                  asChild
+                >
+                  <Link href="/dashboard">
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-white/20 text-white hover:bg-white/30 gap-1.5"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </Button>
+              </>
             ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
-        </div>
-
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-white/20">
-            <nav className="flex flex-col gap-4">
-              <Link
-                href="#features"
-                className="text-sm text-white/80 hover:text-white transition-colors"
-              >
-                Features
-              </Link>
-              <Link
-                href="#how-it-works"
-                className="text-sm text-white/80 hover:text-white transition-colors"
-              >
-                How It Works
-              </Link>
-              <Link
-                href="#testimonials"
-                className="text-sm text-white/80 hover:text-white transition-colors"
-              >
-                Testimonials
-              </Link>
-              <Link
-                href="#contact"
-                className="text-sm text-white/80 hover:text-white transition-colors"
-              >
-                Contact
-              </Link>
-              <div className="flex flex-col gap-2 pt-4">
+              <>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -117,6 +96,78 @@ export function Header() {
                 >
                   <Link href="/register">Get Started</Link>
                 </Button>
+              </>
+            )}
+          </div>
+
+          <button
+            className="md:hidden p-2 text-white"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+
+        {/* Mobile menu */}
+        {isMenuOpen && (
+          <div className="md:hidden py-4 border-t border-white/20">
+            <nav className="flex flex-col gap-4">
+              {navLinks}
+              <div className="flex flex-col gap-2 pt-4">
+                {loggedInEmail ? (
+                  <>
+                    <p className="text-xs text-white/50 truncate px-1">{loggedInEmail}</p>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-white hover:text-white hover:bg-white/20 gap-1.5 justify-start"
+                      asChild
+                    >
+                      <Link href="/report" onClick={() => setIsMenuOpen(false)}>
+                        <Video className="w-4 h-4" />
+                        Report Incident
+                      </Link>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-white hover:text-white hover:bg-white/20 gap-1.5 justify-start"
+                      asChild
+                    >
+                      <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
+                      </Link>
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-white/20 text-white hover:bg-white/30 gap-1.5 justify-start"
+                      onClick={handleSignOut}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:text-white hover:bg-white/20"
+                      asChild
+                    >
+                      <Link href="/login" onClick={() => setIsMenuOpen(false)}>Log In</Link>
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-white text-primary hover:bg-white/90 font-semibold"
+                      asChild
+                    >
+                      <Link href="/register" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </nav>
           </div>

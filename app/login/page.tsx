@@ -1,16 +1,36 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Shield, Eye, EyeOff, ArrowRight, Heart, Lock, Users } from "lucide-react"
+import { Shield, Eye, EyeOff, ArrowRight, Heart, Lock, Users, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { loginUser } from "@/lib/api"
 
 export default function LoginPage() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      await loginUser(email, password)
+      localStorage.setItem("samrakshya_email", email)
+      toast.success("Welcome back!")
+      router.push("/dashboard")
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Login failed. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -126,7 +146,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-5" onSubmit={handleSubmit}>
 
             {/* Email */}
             <div className="space-y-2">
@@ -175,9 +195,12 @@ export default function LoginPage() {
             </div>
 
             {/* Submit */}
-            <Button type="submit" size="lg" className="w-full gap-2 mt-2">
-              Sign In
-              <ArrowRight className="w-4 h-4" />
+            <Button type="submit" size="lg" className="w-full gap-2 mt-2" disabled={loading}>
+              {loading ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Signing in…</>
+              ) : (
+                <>Sign In <ArrowRight className="w-4 h-4" /></>
+              )}
             </Button>
           </form>
 
