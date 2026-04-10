@@ -1,0 +1,32 @@
+[00:08:30.580] Server  ERROR   Error: Cannot find module 'next/dist/compiled/cookie'
+Require stack:
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/api-utils/get-cookie-parser.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/shared/lib/router/utils/prepare-destination.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/shared/lib/router/utils/middleware-route-matcher.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/router-server.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/start-server.js
+[00:08:30.590] Server  ERROR   Error: Cannot find module 'next/dist/compiled/cookie'
+Require stack:
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/api-utils/get-cookie-parser.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/shared/lib/router/utils/prepare-destination.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/shared/lib/router/utils/middleware-route-matcher.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/router-server.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/start-server.js
+[00:08:30.691] Server  ERROR   Error: Cannot find module 'next/dist/compiled/cookie'
+Require stack:
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/api-utils/get-cookie-parser.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/shared/lib/router/utils/prepare-destination.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/shared/lib/router/utils/middleware-route-matcher.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/router-server.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/start-server.js
+[00:08:30.701] Server  ERROR   Error: Cannot find module 'next/dist/compiled/cookie'
+Require stack:
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/api-utils/get-cookie-parser.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/shared/lib/router/utils/prepare-destination.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/shared/lib/router/utils/middleware-route-matcher.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/router-server.js
+- /Users/prabinkauchha/Desktop/frontend/node_modules/next/dist/server/lib/start-server.js
