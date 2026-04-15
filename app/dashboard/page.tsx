@@ -1,7 +1,9 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { deleteContact } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { cancelSOS } from "@/lib/api"; // or your correct path
 import Link from "next/link"
 import {
   Shield, AlertTriangle, CheckCircle, Clock, MapPin,
@@ -20,7 +22,7 @@ import {
   triggerSOS, confirmSOS, getSOSHistory, getUserProfile, addContact, getIncidents,
   type SOSEvent, type EmergencyContact, type Incident,
 } from "@/lib/api"
-
+import { getActiveSOS } from "@/lib/api";
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 function relativeTime(iso: string) {
@@ -43,47 +45,87 @@ function fullDate(iso: string) {
 export default function DashboardPage() {
   const router = useRouter()
   const [email, setEmail] = useState("")
+  const [relationship, setRelationship] = useState("");
 
   // SOS state
+  const [activeSosId, setActiveSosId] = useState<string | null>(null);
   const [latitude,       setLatitude]       = useState("")
   const [longitude,      setLongitude]      = useState("")
   const [triggerLoading, setTriggerLoading] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)
   const [locationLink,   setLocationLink]   = useState<string | null>(null)
+const [locationInterval, setLocationInterval] = useState<NodeJS.Timeout | null>(null);
 
   // History
   const [history,        setHistory]        = useState<SOSEvent[]>([])
   const [historyLoading, setHistoryLoading] = useState(true)
 
   // Contacts
-  const [contacts,         setContacts]         = useState<EmergencyContact[]>([])
+ const [contacts, setContacts] = useState<any[]>([])
   const [contactsLoading,  setContactsLoading]  = useState(true)
   const [newName,          setNewName]          = useState("")
   const [newPhone,         setNewPhone]         = useState("")
   const [addingContact,    setAddingContact]    = useState(false)
 
   // Incidents
-  const [incidents,        setIncidents]        = useState<Incident[]>([])
+  const [incidents, setIncidents] = useState<any[]>([])
   const [incidentsLoading, setIncidentsLoading] = useState(true)
 
-  useEffect(() => {
-    const saved = localStorage.getItem("samrakshya_email")
-    if (!saved) {
-      toast.error("Please log in to access the dashboard.")
-      router.replace("/login")
-      return
+useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    toast.error("Please login first");
+    router.replace("/login");
+    return;
+  }
+
+  async function init() {
+    try {
+      const res = await getUserProfile();
+      const userEmail = res.data.user.email;
+
+      setEmail(userEmail);
+
+      // ✅ LOAD EVERYTHING
+      await loadActiveSOS();
+      await loadHistory();
+      await loadProfile(userEmail);
+      await loadIncidents(userEmail);
+
+    } catch (err) {
+      console.error("Init failed:", err);
+      localStorage.clear();
+      router.replace("/login");
     }
-    setEmail(saved)
-    loadProfile(saved)
-    loadIncidents(saved)
-    loadHistory()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }
+
+  init();
+}, []);// ✅ IMPORTANT
+async function loadActiveSOS() {
+  try {
+    const res = await getActiveSOS();
+
+    const active = res.data.activeSos;
+
+    if (active?._id) {
+      console.log("ACTIVE SOS FOUND:", res);
+
+      setActiveSosId(active._id);
+      localStorage.setItem("activeSosId", active._id);
+    } else {
+      console.log("No active SOS");
+    }
+  } catch (err) {
+    console.error("Failed to fetch active SOS", err);
+  }
+}
 
   async function loadProfile(emailArg: string) {
     setContactsLoading(true)
     try {
-      const user = await getUserProfile(emailArg)
-      setContacts(user.emergencyContacts ?? [])
+   const res = await getUserProfile()
+    setContacts(res.data.user.emergencyContacts ?? [])
     } catch {
       // profile may not exist yet — silently ignore
     } finally {
@@ -113,9 +155,27 @@ export default function DashboardPage() {
     setTriggerLoading(true)
     setLocationLink(null)
     try {
-      const res = await triggerSOS(email, lat, lng)
-      setLocationLink(res.location)
-      toast.success(res.message)
+const res = await triggerSOS(lat, lng);
+
+console.log("SOS RESPONSE:", res);
+
+const sosId = res.data?.sosId;
+
+if (sosId) {
+  localStorage.setItem("activeSosId", sosId);
+  setActiveSosId(sosId);
+  console.log("Saved SOS ID:", sosId);
+
+  const interval = setInterval(() => {
+    sendLocationUpdate(sosId);
+  }, 20000);
+  setLocationInterval(interval);
+} else {
+  console.error("SOS ID NOT FOUND", res);
+}
+
+setLocationLink(res.data.location);
+      toast.success("Sos ALert sent sucessfully")
       loadHistory()
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed to trigger SOS.")
@@ -124,37 +184,100 @@ export default function DashboardPage() {
     }
   }
 
-  async function handleConfirm() {
-    setConfirmLoading(true)
-    try {
-      await confirmSOS()
-      toast.success("SOS confirmed. Escalation stopped.")
-      loadHistory()
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to confirm SOS.")
-    } finally {
-      setConfirmLoading(false)
-    }
-  }
+const handleConfirm = async () => {
+  try {
+    setConfirmLoading(true);
 
-  async function loadIncidents(emailArg: string) {
-    setIncidentsLoading(true)
-    try {
-      setIncidents(await getIncidents(emailArg))
-    } catch {
-      // silently ignore if no incidents yet
-    } finally {
-      setIncidentsLoading(false)
+    let sosId = activeSosId || localStorage.getItem("activeSosId");
+
+    if (!sosId) {
+      const res = await getActiveSOS();
+      sosId = res.data?.activeSos?._id;
     }
+
+    if (!sosId) {
+      console.error("No active SOS ID");
+      return;
+    }
+
+   await cancelSOS(sosId);
+
+if (locationInterval) {
+  clearInterval(locationInterval);
+  setLocationInterval(null);
+}
+localStorage.removeItem("activeSosId");
+setActiveSosId(null);
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setConfirmLoading(false);
   }
+};
+
+async function sendLocationUpdate(sosId: string) {
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const { latitude: lat, longitude: lng } = pos.coords;
+    try {
+      await fetch("http://localhost:4321/api/sos/location", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ lat, lng }),
+      });
+      console.log("📍 Location updated:", lat, lng);
+    } catch (err) {
+      console.error("Location update failed:", err);
+    }
+  });
+}
+
+async function loadIncidents(emailArg: string) {
+  setIncidentsLoading(true)
+  try {
+    const res = await getIncidents(emailArg)
+    setIncidents(Array.isArray(res) ? res : [])
+  } catch {
+    setIncidents([])
+  } finally {
+    setIncidentsLoading(false)
+  }
+  try {
+    const res = await getIncidents(emailArg)
+
+    // ✅ ALWAYS force array
+    setIncidents(Array.isArray(res) ? res : [])
+  } catch {
+    setIncidents([]) // fallback
+  } finally {
+    setIncidentsLoading(false)
+  }
+}
+type AddContactResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    emergencyContact: EmergencyContact;
+  };
+};
 
   async function handleAddContact(e: React.FormEvent) {
     e.preventDefault()
     if (!newName.trim() || !newPhone.trim()) return
     setAddingContact(true)
     try {
-      const res = await addContact(email, newName.trim(), newPhone.trim())
-      setContacts(res.contacts)
+const res = await addContact({
+  name: newName.trim(),
+  phone: newPhone.trim(),
+  relationship
+});
+setContacts(prev => [
+  ...prev,
+  ...(res.data?.emergencyContact ? [res.data.emergencyContact] : [])
+]);
       setNewName("")
       setNewPhone("")
       toast.success("Emergency contact added.")
@@ -169,7 +292,7 @@ export default function DashboardPage() {
   const totalSOS      = history.length
   const activeSOS     = history.filter(e => e.status === "active").length
   const confirmedSOS  = history.filter(e => e.status === "confirmed").length
-  const contactCount  = contacts.length
+  const contactCount = contacts?.length || 0
   const incidentCount = incidents.length
 
   const stats = [
@@ -179,6 +302,8 @@ export default function DashboardPage() {
     { label: "Contacts",   value: contactCount,   icon: Users,         color: "text-blue-600 dark:text-blue-400"  },
     { label: "Incidents",  value: incidentCount,  icon: FileVideo,     color: "text-violet-600 dark:text-violet-400" },
   ]
+
+    console.log("INCIDENTS:", incidents)
 
   return (
     <div className="min-h-screen bg-background">
@@ -401,6 +526,7 @@ export default function DashboardPage() {
                   <ul className="space-y-2">
                     {contacts.map((c, i) => (
                       <li
+                    
                         key={c._id ?? i}
                         className="flex items-center gap-3 p-3 rounded-lg bg-muted/40 border border-border/50"
                       >
@@ -413,12 +539,32 @@ export default function DashboardPage() {
                           <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
                           <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                             <Phone className="w-3 h-3 shrink-0" />
-                            {c.phone}
+                            {c.phone || c.phoneNumber || "No number"}
                           </p>
                         </div>
                         <Badge variant="secondary" className="text-xs shrink-0">
                           #{i + 1}
                         </Badge>
+                        <div className="flex items-center gap-2">
+  <Badge variant="secondary" className="text-xs">
+    #{i + 1}
+  </Badge>
+
+  <button
+    onClick={async () => {
+      try {
+        await deleteContact(c._id);
+        setContacts(prev => prev.filter(item => item._id !== c._id));
+        toast.success("Contact deleted");
+      } catch (err) {
+        toast.error("Failed to delete");
+      }
+    }}
+    className="text-xs text-red-500 hover:underline"
+  >
+    Delete
+  </button>
+</div>
                       </li>
                     ))}
                   </ul>
@@ -448,6 +594,18 @@ export default function DashboardPage() {
                     required
                   />
                 </div>
+                <select
+  value={relationship}
+  onChange={(e) => setRelationship(e.target.value)}
+>
+<option value="friend">Friend</option>
+<option value="parent">Parent</option>
+<option value="sibling">Sibling</option>
+<option value="child">Child</option>
+<option value="relative">Relative</option>
+<option value="neighbor">Neighbor</option>
+<option value="coworker">Coworker</option>
+</select>
                 <Button
                   type="submit"
                   variant="outline"
@@ -461,6 +619,7 @@ export default function DashboardPage() {
                     <><UserPlus className="w-3.5 h-3.5" /> Add Contact</>
                   )}
                 </Button>
+              
               </form>
 
             </CardContent>

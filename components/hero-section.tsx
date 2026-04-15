@@ -14,12 +14,12 @@ export function HeroSection() {
   const [sosPending, setSosPending] = useState(false)
 
   const handleSOS = useCallback(async () => {
-    const email = typeof window !== "undefined" ? localStorage.getItem("samrakshya_email") : null
+    const token = localStorage.getItem("token");
 
-    if (!email) {
-      router.push("/login")
-      return
-    }
+if (!token) {
+  router.push("/login");
+  return;
+}
 
     if (!navigator.geolocation) {
       toast.error("Your browser does not support geolocation.")
@@ -32,7 +32,17 @@ export function HeroSection() {
       async (pos) => {
         try {
           const { latitude, longitude } = pos.coords
-          await triggerSOS(email, latitude, longitude)
+const res = await triggerSOS(latitude, longitude);
+
+const sosId = res.data?.sosId; // ✅ correct
+
+if (sosId) {
+  localStorage.setItem("activeSosId", sosId);
+  console.log("Saved SOS ID:", sosId);
+} else {
+  console.error("SOS ID NOT FOUND", res);
+}
+
           toast.success("SOS alert sent! Your emergency contacts have been notified.")
         } catch (err: unknown) {
           toast.error(err instanceof Error ? err.message : "Failed to send SOS alert.")

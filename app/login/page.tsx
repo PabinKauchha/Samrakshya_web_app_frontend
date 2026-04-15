@@ -17,20 +17,39 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    try {
-      await loginUser(email, password)
-      localStorage.setItem("samrakshya_email", email)
-      toast.success("Welcome back!")
-      router.push("/dashboard")
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Login failed. Please try again.")
-    } finally {
-      setLoading(false)
-    }
+async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    const res = await loginUser(email, password);
+
+    // STEP 1: store token
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("email", res.data.user.email)
+    // STEP 2: get role
+    const role = res.data.user.role;
+
+    console.log("ROLE:", role);
+    console.log("TOKEN:", res.data.token);
+
+    toast.success("Welcome back!");
+
+    // ✅ STEP 3: delay + hard redirect (IMPORTANT)
+    setTimeout(() => {
+      if (role === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/dashboard";
+      }
+    }, 100);
+
+  } catch (err: unknown) {
+    toast.error(err instanceof Error ? err.message : "Login failed.");
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <div className="min-h-screen flex">

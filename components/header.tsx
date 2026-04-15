@@ -11,9 +11,16 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [loggedInEmail, setLoggedInEmail] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLoggedInEmail(localStorage.getItem("samrakshya_email"))
-  }, [])
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  const email = localStorage.getItem("email");
+
+  if (token && email) {
+    setLoggedInEmail(email);
+  } else {
+    setLoggedInEmail(null);
+  }
+}, []);
 
   function handleSignOut() {
     localStorage.removeItem("samrakshya_email")
