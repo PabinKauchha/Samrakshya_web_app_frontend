@@ -53,7 +53,7 @@ const testimonials = [
 
 export function TestimonialsSection() {
   return (
-    <section id="testimonials" className="py-20 md:py-32">
+    <section id="testimonials" className="bg-gradient-to-b from-pink-100 via-pink-50 to-pink-100 py-20 md:py-32">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <p className="text-sm text-primary font-medium mb-4">Testimonials</p>
@@ -69,7 +69,7 @@ export function TestimonialsSection() {
           {testimonials.map((t) => (
             <div
               key={t.name}
-              className="flex flex-col p-8 rounded-2xl bg-card border border-border hover:border-primary/40 hover:shadow-md transition-all duration-300"
+              className="flex flex-col p-8 rounded-2xl bg-pink-50/90 border border-primary/20 hover:border-primary/40 hover:shadow-md transition-all duration-300"
             >
               {/* Stars */}
               <div className="flex gap-1 mb-5">
@@ -87,7 +87,7 @@ export function TestimonialsSection() {
               </p>
 
               {/* Author */}
-              <div className="flex items-center gap-3 pt-4 border-t border-border">
+              <div className="flex items-center gap-3 pt-4 border-t border-primary/20">
                 <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center text-sm font-bold text-primary shrink-0">
                   {t.avatar}
                 </div>

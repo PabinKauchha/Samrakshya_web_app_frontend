@@ -4,13 +4,15 @@ import { useState, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Shield, ArrowRight, MapPin, Bell, Video, Loader2, Phone } from "lucide-react"
+import { LayoutDashboard, ArrowRight, MapPin, Bell, Video, Loader2, Phone, Sparkles, Users, BadgeCheck } from "lucide-react"
 import { WomanSilhouette } from "@/components/woman-silhouette"
 import { triggerSOS } from "@/lib/api"
 import { toast } from "sonner"
+import { useAuth } from "@/components/auth/auth-provider"
 
 export function HeroSection() {
   const router = useRouter()
+  const { isAuthenticated } = useAuth()
   const [sosPending, setSosPending] = useState(false)
 
   const handleSOS = useCallback(async () => {
@@ -34,11 +36,12 @@ if (!token) {
           const { latitude, longitude } = pos.coords
 const res = await triggerSOS(latitude, longitude);
 
-const sosId = res.data?.sosId; // ✅ correct
+const sosId = res.data?.sosId; // correct
 
 if (sosId) {
   localStorage.setItem("activeSosId", sosId);
   console.log("Saved SOS ID:", sosId);
+  router.push("/dashboard");
 } else {
   console.error("SOS ID NOT FOUND", res);
 }
@@ -59,125 +62,134 @@ if (sosId) {
   }, [router])
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-40 md:pb-32" style={{ minHeight: "100svh" }}>
-      {/* Glow blobs */}
+    <section className="relative overflow-hidden pt-36 pb-24 md:pt-44 md:pb-32" style={{ minHeight: "100svh" }}>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(244,114,182,0.25),transparent_36%),linear-gradient(180deg,rgba(253,242,248,1),rgba(252,231,243,0.98)_36%,rgba(253,242,248,1)_88%)]" />
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-primary/8 rounded-full blur-3xl" />
+        <div className="absolute left-[-120px] top-28 h-80 w-80 rounded-full bg-pink-300/30 blur-3xl" />
+        <div className="absolute right-[-100px] top-20 h-96 w-96 rounded-full bg-rose-200/30 blur-3xl" />
+        <div className="absolute bottom-0 left-1/2 h-72 w-[36rem] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />
       </div>
 
       <WomanSilhouette />
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary border border-border mb-8">
-            <Shield className="w-4 h-4 text-primary" />
-            <span className="text-sm text-muted-foreground">Your Safety, Our Priority</span>
-          </div>
+        <div className="mx-auto max-w-6xl">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="text-center lg:text-left">
+              <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/85 px-4 py-2 text-foreground/80 backdrop-blur-md">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-sm">Modern safety support for everyday confidence</span>
+              </div>
 
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight mb-6 text-balance">
-            Safety at every step
-          </h1>
+              <h1 className="mb-6 text-4xl font-black leading-[1.05] tracking-tight text-foreground md:text-6xl lg:text-7xl">
+                Stay connected, protected, and ready in every moment.
+              </h1>
 
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed text-pretty">
-            Samrakshya empowers women with instant emergency alerts, legal guidance on harassment, 
-            and mental health support — all in one secure platform designed for your safety.
-          </p>
+              <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-foreground/70 lg:mx-0 lg:text-xl">
+                Samrakshya brings emergency response, trusted contact alerts, location sharing,
+                and incident reporting into one calm, professional safety experience.
+              </p>
 
-          {/* Primary actions */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-            <Button size="lg" className="w-full sm:w-auto gap-2" asChild>
-              <Link href="/register">
-                Get Started Free
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </Button>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto gap-2" asChild>
-              <Link href="/report">
-                <Video className="w-4 h-4" />
-                Report Incident
-              </Link>
-            </Button>
-          </div>
-
-          {/* SOS button */}
-          <div className="flex flex-col items-center gap-3 mb-16">
-            <button
-              onClick={handleSOS}
-              disabled={sosPending}
-              aria-label="Send SOS emergency alert"
-              className="
-                group relative w-full max-w-[360px] overflow-hidden rounded-2xl
-                bg-red-600 hover:bg-red-500
-                px-6 py-5 text-left
-                transition-colors duration-150
-                active:scale-[0.97]
-                disabled:opacity-60 disabled:cursor-not-allowed
-                focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-background
-              "
-            >
-              {/* slow breathing ring — urgent but not tacky */}
-              <span className="pointer-events-none absolute inset-0 rounded-2xl ring-2 ring-red-400/60 animate-pulse" />
-
-              <div className="relative flex items-center gap-4">
-                {/* icon */}
-                <div className="w-14 h-14 shrink-0 rounded-xl bg-white/20 flex items-center justify-center group-hover:bg-white/25 transition-colors">
-                  {sosPending ? (
-                    <Loader2 className="w-7 h-7 text-white animate-spin" />
-                  ) : (
-                    <Phone className="w-7 h-7 text-white" />
-                  )}
-                </div>
-
-                {/* text */}
-                <div className="min-w-0">
-                  <p className="text-[11px] font-semibold text-red-200 uppercase tracking-[0.14em] mb-0.5">
-                    Emergency
-                  </p>
-                  <p className="text-2xl font-black text-white leading-none tracking-tight">
-                    {sosPending ? "Alerting…" : "Send SOS"}
-                  </p>
-                  <p className="text-xs text-red-100/75 mt-1">
-                    {sosPending ? "Getting your location…" : "Notify all emergency contacts instantly"}
-                  </p>
-                </div>
-
-                {/* arrow */}
-                {!sosPending && (
-                  <ArrowRight className="ml-auto shrink-0 w-5 h-5 text-white/50 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+              <div className="mb-6 flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
+                {isAuthenticated ? (
+                  <Button size="lg" className="h-12 w-full gap-2 rounded-2xl bg-white text-primary shadow-xl shadow-primary/20 hover:bg-white/90 sm:w-auto" asChild>
+                    <Link href="/dashboard">
+                      <LayoutDashboard className="w-4 h-4" />
+                      Go to Dashboard
+                    </Link>
+                  </Button>
+                ) : (
+                  <>
+                    <Button size="lg" className="h-12 w-full gap-2 rounded-2xl bg-white text-primary shadow-xl shadow-primary/20 hover:bg-white/90 sm:w-auto" asChild>
+                      <Link href="/register">
+                        Get Started
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="lg" className="h-12 w-full gap-2 rounded-2xl border-primary/30 bg-pink-50 text-foreground hover:bg-pink-100 hover:text-foreground sm:w-auto" asChild>
+                      <Link href="/login">Log In</Link>
+                    </Button>
+                  </>
                 )}
+                <Button variant="outline" size="lg" className="h-12 w-full gap-2 rounded-2xl border-primary/30 bg-pink-50 text-foreground hover:bg-pink-100 hover:text-foreground sm:w-auto" asChild>
+                  <Link href="/report">
+                    <Video className="w-4 h-4" />
+                    Report Incident
+                  </Link>
+                </Button>
               </div>
-            </button>
 
-            <p className="text-xs text-muted-foreground">
-              Your live GPS location is shared the moment you tap
-            </p>
-          </div>
-
-          {/* Feature preview cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            <div className="group p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-4 mx-auto group-hover:bg-primary/20 transition-colors">
-                <Bell className="w-6 h-6 text-primary" />
+              <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-foreground/65 lg:justify-start">
+                <span className="inline-flex items-center gap-2">
+                  <BadgeCheck className="h-4 w-4 text-emerald-300" />
+                  Rapid SOS assistance
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-cyan-300" />
+                  Live location sharing
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <Users className="h-4 w-4 text-violet-300" />
+                  Trusted contact management
+                </span>
               </div>
-              <h3 className="font-semibold text-foreground mb-2">SOS Alerts</h3>
-              <p className="text-sm text-muted-foreground">One-tap emergency alerts to your trusted contacts</p>
             </div>
 
-            <div className="group p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-4 mx-auto group-hover:bg-primary/20 transition-colors">
-                <MapPin className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-semibold text-foreground mb-2">Live Location</h3>
-              <p className="text-sm text-muted-foreground">Real-time GPS tracking shared with contacts</p>
-            </div>
+            <div className="relative">
+              <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-fuchsia-500/25 via-primary/20 to-cyan-400/20 blur-2xl" />
+              <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-pink-50/90 p-6 shadow-2xl shadow-primary/10 backdrop-blur-xl">
+                <div className="mb-5 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/45">Safety Command</p>
+                    <h3 className="mt-2 text-2xl font-black text-foreground">Emergency readiness</h3>
+                  </div>
+                  <div className="rounded-2xl border border-emerald-300/30 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                    Status: Ready
+                  </div>
+                </div>
 
-            <div className="group p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-4 mx-auto group-hover:bg-primary/20 transition-colors">
-                <Video className="w-6 h-6 text-primary" />
+                <div className="mb-6 grid gap-3 sm:grid-cols-3">
+                  {[
+                    { icon: Bell, title: "Instant Alerts", value: "All trusted contacts" },
+                    { icon: MapPin, title: "Location", value: "GPS-linked response" },
+                    { icon: Video, title: "Reports", value: "Evidence capture flow" },
+                  ].map(({ icon: Icon, title, value }) => (
+                    <div key={title} className="rounded-2xl border border-primary/15 bg-primary/5 p-4">
+                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white">
+                        <Icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">{title}</p>
+                      <p className="mt-1 text-xs leading-relaxed text-foreground/60">{value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={handleSOS}
+                  disabled={sosPending}
+                  aria-label="Send SOS emergency alert"
+                  className="group relative mb-4 w-full overflow-hidden rounded-[1.75rem] bg-gradient-to-r from-red-500 to-rose-700 px-6 py-5 text-left shadow-xl shadow-red-950/35 transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.985] disabled:opacity-60"
+                >
+                  <span className="pointer-events-none absolute inset-0 rounded-[1.75rem] ring-2 ring-red-300/40 animate-pulse" />
+                  <div className="relative flex items-center gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15">
+                      {sosPending ? <Loader2 className="h-7 w-7 animate-spin text-white" /> : <Phone className="h-7 w-7 text-white" />}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-red-100/80">Emergency Action</p>
+                      <p className="text-2xl font-black leading-none text-white">{sosPending ? "Alerting..." : "Send SOS"}</p>
+                      <p className="mt-1 text-xs text-red-50/80">
+                        {sosPending ? "Fetching your live location and notifying contacts" : "Notify all emergency contacts instantly"}
+                      </p>
+                    </div>
+                    {!sosPending && <ArrowRight className="ml-auto h-5 w-5 shrink-0 text-white/65 transition-all group-hover:translate-x-0.5 group-hover:text-white" />}
+                  </div>
+                </button>
+
+                <p className="text-xs text-foreground/55">
+                  The app uses your current GPS location to support faster, clearer emergency responses.
+                </p>
               </div>
-              <h3 className="font-semibold text-foreground mb-2">Video Reports</h3>
-              <p className="text-sm text-muted-foreground">Record or upload incident evidence securely</p>
             </div>
           </div>
         </div>

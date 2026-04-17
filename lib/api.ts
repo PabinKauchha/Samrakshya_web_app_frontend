@@ -1,6 +1,6 @@
 const BASE_URL = "http://localhost:4321";
 
-// ✅ ALWAYS get fresh token
+// Always get fresh token
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
 
@@ -10,7 +10,15 @@ function getAuthHeaders() {
   };
 }
 
-// ✅ universal request handler
+// For FormData requests we must not set `Content-Type` manually.
+function getAuthHeadersForFormData() {
+  const token = localStorage.getItem("token");
+  return {
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+}
+
+// Universal request handler
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
@@ -94,6 +102,20 @@ export function registerUser(name: string, email: string, password: string) {
   });
 }
 
+export function forgotPassword(email: string) {
+  return request<{ message: string }>("/api/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export function resetPassword(token: string, password: string) {
+  return request<{ message: string }>(`/api/auth/reset-password/${token}`, {
+    method: "POST",
+    body: JSON.stringify({ password }),
+  });
+}
+
 export function getUserProfile() {
   return request<{
     data: { user: User & { emergencyContacts: any[] } };
@@ -158,7 +180,27 @@ export function cancelSOS(sosId: string) {
   });
 }
 
-// ✅ FIXED (you forgot headers before)
+// Admin-only: list currently active SOS events (array).
+export function adminGetActiveSOSList() {
+  return request<{
+    success: boolean;
+    message: string;
+    data: Array<{ _id: string; status: string; user?: { name?: string; email?: string } }>;
+  }>(`/api/admin/active-sos`);
+}
+
+// Admin-only: resolve an active SOS on behalf of a user.
+export function adminResolveSOS(sosId: string) {
+  return request<{
+    success: boolean;
+    message: string;
+    data: { sosId: string; status: string };
+  }>(`/api/admin/sos/${sosId}/resolve`, {
+    method: "POST",
+  });
+}
+
+// Uses the shared request helper so auth headers are included.
 export function confirmSOS(sosId: string) {
   return request(`/api/sos/confirm/${sosId}`, {
     method: "POST",
@@ -182,7 +224,7 @@ export async function getSOSHistory() {
 // ───────── INCIDENTS ─────────
 //
 
-// ✅ FIXED BASE_URL
+// Incident API helpers
 export async function getIncidents(email: string) {
   const res = await fetch(`${BASE_URL}/api/incidents?email=${email}`, {
     headers: getAuthHeaders(),
@@ -207,6 +249,7 @@ export async function reportIncident(
   const res = await fetch(`${BASE_URL}/api/incidents/report`, {
     method: "POST",
     body: form,
+    headers: getAuthHeadersForFormData(),
   });
 
   if (!res.ok) {

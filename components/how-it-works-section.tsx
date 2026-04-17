@@ -1,4 +1,4 @@
-import { UserPlus, Users, Bell, Shield } from "lucide-react"
+import { UserPlus, Users, Bell, HeartHandshake } from "lucide-react"
 
 const steps = [
   {
@@ -21,7 +21,7 @@ const steps = [
   },
   {
     number: "04",
-    icon: Shield,
+    icon: HeartHandshake,
     title: "Access Resources",
     description: "Browse legal information, connect with counselors, and report incidents through our secure platform."
   }
@@ -29,7 +29,7 @@ const steps = [
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="py-20 md:py-32">
+    <section id="how-it-works" className="bg-gradient-to-b from-pink-50 via-pink-100 to-pink-50 py-20 md:py-32">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <p className="text-sm text-primary font-medium mb-4">How It Works</p>
@@ -49,7 +49,7 @@ export function HowItWorksSection() {
               )}
               
               <div className="text-center">
-                <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-card border border-border mb-6">
+                <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-pink-50 border border-primary/20 mb-6 shadow-sm">
                   <step.icon className="w-10 h-10 text-primary" />
                   <span className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center">
                     {step.number.replace("0", "")}

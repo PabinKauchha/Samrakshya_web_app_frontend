@@ -3,14 +3,14 @@
 import { useEffect } from "react";
 import L from "leaflet";
 
-// 🔴 Victim (Red)
+// Victim marker
 const redIcon = new L.Icon({
   iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
   iconSize: [32, 32],
   iconAnchor: [16, 32],
 });
 
-// 🔵 Helper (Blue)
+// Helper marker
 const blueIcon = new L.Icon({
   iconUrl: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
   iconSize: [32, 32],
@@ -31,12 +31,12 @@ sosList.forEach((sos: any) => {
     const lat = Number(sos.latitude);
     const lng = Number(sos.longitude);
 
-    // 🔴 Victim marker
+    // Victim marker
     L.marker([lat, lng], { icon: redIcon })
       .addTo(map)
       .bindPopup(`<b>${sos.user?.name || "Victim"}</b><br/>SOS Active`);
 
-    // 🔵 Helper marker (if exists)
+    // Helper marker (if it exists)
     if (sos.helperLocation) {
       const hLat = Number(sos.helperLocation.latitude);
       const hLng = Number(sos.helperLocation.longitude);
