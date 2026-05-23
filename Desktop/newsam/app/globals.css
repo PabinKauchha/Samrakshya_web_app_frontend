@@ -1,0 +1,281 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(0.968 0.02 350);
+  --foreground: oklch(0.27 0.04 350);
+  --card: oklch(0.986 0.015 350);
+  --card-foreground: oklch(0.25 0.035 350);
+  --popover: oklch(0.99 0.015 350);
+  --popover-foreground: oklch(0.25 0.035 350);
+  --primary: oklch(0.69 0.10 350);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.02 350);
+  --secondary-foreground: oklch(0.31 0.04 350);
+  --muted: oklch(0.95 0.02 350);
+  --muted-foreground: oklch(0.52 0.03 350);
+  --accent: oklch(0.91 0.04 350);
+  --accent-foreground: oklch(0.33 0.05 350);
+  --destructive: oklch(0.52 0.22 22);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.89 0.02 350);
+  --input: oklch(0.958 0.016 350);
+  --ring: oklch(0.66 0.09 350);
+  --chart-1: oklch(0.66 0.09 350);
+  --chart-2: oklch(0.72 0.08 330);
+  --chart-3: oklch(0.76 0.07 10);
+  --chart-4: oklch(0.68 0.08 335);
+  --chart-5: oklch(0.74 0.07 8);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.958 0.02 350);
+  --sidebar-foreground: oklch(0.27 0.04 350);
+  --sidebar-primary: oklch(0.66 0.09 350);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.92 0.035 350);
+  --sidebar-accent-foreground: oklch(0.33 0.05 350);
+  --sidebar-border: oklch(0.89 0.02 350);
+  --sidebar-ring: oklch(0.66 0.09 350);
+}
+
+.dark {
+  --background: oklch(0.16 0.024 350);
+  --foreground: oklch(0.94 0.008 350);
+  --card: oklch(0.20 0.024 350);
+  --card-foreground: oklch(0.94 0.008 350);
+  --popover: oklch(0.20 0.024 350);
+  --popover-foreground: oklch(0.94 0.008 350);
+  --primary: oklch(0.74 0.16 350);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.26 0.026 350);
+  --secondary-foreground: oklch(0.94 0.008 350);
+  --muted: oklch(0.27 0.022 350);
+  --muted-foreground: oklch(0.66 0.03 350);
+  --accent: oklch(0.34 0.055 350);
+  --accent-foreground: oklch(0.94 0.008 350);
+  --destructive: oklch(0.58 0.22 22);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.32 0.026 350);
+  --input: oklch(0.26 0.022 350);
+  --ring: oklch(0.74 0.16 350);
+  --chart-1: oklch(0.74 0.16 350);
+  --chart-2: oklch(0.78 0.13 320);
+  --chart-3: oklch(0.80 0.10 12);
+  --chart-4: oklch(0.72 0.14 335);
+  --chart-5: oklch(0.76 0.12 8);
+  --sidebar: oklch(0.18 0.024 350);
+  --sidebar-foreground: oklch(0.94 0.008 350);
+  --sidebar-primary: oklch(0.74 0.16 350);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.32 0.055 350);
+  --sidebar-accent-foreground: oklch(0.94 0.008 350);
+  --sidebar-border: oklch(0.32 0.026 350);
+  --sidebar-ring: oklch(0.74 0.16 350);
+}
+
+@theme inline {
+  --font-sans: 'Inter', 'Geist', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', 'Geist', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   KEYFRAME ANIMATIONS
+═══════════════════════════════════════════════ */
+
+/* Normal SOS button rings */
+@keyframes sos-ring {
+  0%, 100% { transform: scale(1);    opacity: 0.8; }
+  50%       { transform: scale(1.12); opacity: 0.4; }
+}
+@keyframes sos-ring-2 {
+  0%, 100% { transform: scale(1);    opacity: 0.5; }
+  50%       { transform: scale(1.22); opacity: 0.15; }
+}
+
+/* Entrance animations */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Floating */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* Shimmer */
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position: 200% center; }
+}
+
+/* Blob drift */
+@keyframes blob-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -20px) scale(1.08); }
+  66%       { transform: translate(-20px, 15px) scale(0.94); }
+}
+
+/* ── SOS EMERGENCY ALERT MODE ANIMATIONS ── */
+@keyframes emergency-vignette {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 0.80; }
+}
+@keyframes emergency-ring-out {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  80%  { transform: scale(1.8); opacity: 0;   }
+  100% { transform: scale(1.8); opacity: 0;   }
+}
+@keyframes emergency-ring-mid {
+  0%   { transform: scale(1);   opacity: 0.5; }
+  80%  { transform: scale(1.5); opacity: 0;   }
+  100% { transform: scale(1.5); opacity: 0;   }
+}
+@keyframes emergency-glow-pulse {
+  0%, 100% { box-shadow: 0 0 60px 20px rgba(239,68,68,0.45); }
+  50%       { box-shadow: 0 0 120px 40px rgba(239,68,68,0.7); }
+}
+@keyframes sos-text-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0.65; }
+}
+
+/* ═══════════════════════════════════════════════
+   UTILITY CLASSES
+═══════════════════════════════════════════════ */
+
+.animate-sos-ring   { animation: sos-ring   2.2s ease-in-out infinite; }
+.animate-sos-ring-2 { animation: sos-ring-2 2.2s ease-in-out infinite 0.4s; }
+.animate-fade-in-up { animation: fade-in-up 0.6s ease-out both; }
+.animate-fade-in    { animation: fade-in    0.4s ease-out both; }
+.animate-float      { animation: float      4s   ease-in-out infinite; }
+.animate-blob       { animation: blob-drift 8s   ease-in-out infinite; }
+
+/* Emergency-specific */
+.animate-emergency-vignette   { animation: emergency-vignette  2s   ease-in-out infinite; }
+.animate-emergency-ring-out   { animation: emergency-ring-out  2.2s ease-out     infinite; }
+.animate-emergency-ring-mid   { animation: emergency-ring-mid  2.2s ease-out     infinite 0.5s; }
+.animate-emergency-glow-pulse { animation: emergency-glow-pulse 2s  ease-in-out  infinite; }
+.animate-sos-text-blink       { animation: sos-text-blink       1.8s ease-in-out infinite; }
+
+/* Delay helpers */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* ── Gradient text ── */
+.gradient-text {
+  background: linear-gradient(135deg, oklch(0.56 0.14 350), oklch(0.50 0.16 310));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Card hover lift ── */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px -8px oklch(0.55 0.14 350 / 0.16);
+  border-color: oklch(0.55 0.14 350 / 0.42);
+}
+
+/* ── Glass ── */
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ── SOS button (landing hero) ── */
+.sos-btn {
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.sos-btn:hover  { transform: scale(1.04); }
+.sos-btn:active { transform: scale(0.96); }
+
+.sos-ring-1,
+.sos-ring-2 {
+  position: absolute;
+  border-radius: 9999px;
+  border: 2px solid rgb(239, 68, 68);
+  pointer-events: none;
+}
+.sos-ring-1 { animation: sos-ring   2.4s ease-in-out infinite; inset: -10px; }
+.sos-ring-2 { animation: sos-ring-2 2.4s ease-in-out infinite 0.6s; inset: -22px; border-color: rgba(239, 68, 68, 0.4); }
+
+/* ── Section pill tag ── */
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.875rem;
+  border-radius: 9999px;
+  background: oklch(0.55 0.14 350 / 0.1);
+  color: oklch(0.55 0.14 350);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid oklch(0.55 0.14 350 / 0.25);
+}
